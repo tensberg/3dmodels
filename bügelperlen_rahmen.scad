@@ -35,7 +35,7 @@ textframe_border = 2;
 textframe_inset = 2;
 
 textframe_x = (frame_width-textframe_width) / 2;
-textframe_y = frame_length - textframe_length;
+textframe_y = frame_length - textframe_length + outer_border_width/2 - 2.5;
 
 // lower border half
 border_half();
@@ -119,10 +119,10 @@ module border_half() {
     }
     
     // text
-    translate([frame_width / 2, frame_length - textframe_length / 2, 0])
+    translate([frame_width / 2, textframe_y + textframe_length/2, 0])
         linear_extrude(textframe_inset)
             mirror([0,1])
-                text("Nikolas 2012", halign="center", valign="center", size = 10, font="Comic neue");
+                text("Nikolas 2012", halign="center", valign="center", size = 10, font="Comic Neue:style=Bold");
 
 }
 
