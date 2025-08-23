@@ -24,10 +24,16 @@ connector_tolerance = 0.1;
 connector_diameter = 5;
 connector_height = frame_height / 2 / 2;
 
-hanger_height_offset = 2;
+hanger_height = frame_height / 2;
 hanger_length_offset = 5;
+hanger_connector_length = outer_border_width*2/3;
 hanger_outer_diameter = 12;
 hanger_inner_diameter = 6;
+hanger_radius = hanger_outer_diameter / 2;
+hanger_connector_width = hanger_inner_diameter;
+hanger_connector_height = (frame_height - hanger_height)/2 - 1;
+hanger_connector_inset = sqrt(hanger_radius^2 - (hanger_connector_width/2)^2);
+hanger_tolerance = 1.01;
 
 textframe_width = frame_width / 2;
 textframe_length = 20;
@@ -38,21 +44,16 @@ textframe_x = (frame_width-textframe_width) / 2;
 textframe_y = frame_length - textframe_length + outer_border_width/2 - 2.5;
 
 // lower border half
-border_half();
-translate([0, 0, frame_height / 2])
-    connectors();
-
-// hanger
-translate([frame_width / 2, -hanger_length_offset, hanger_height_offset]) {
-    difference() {
-        cylinder(d = hanger_outer_diameter, h = frame_height - hanger_height_offset*2);
-        // inner hole
-        translate([0,0,-1])
-            cylinder(d = hanger_inner_diameter, h = frame_height);
-        // frame cutout
-        translate([0, outer_border_width/2 + hanger_length_offset - connector_tolerance, frame_height/2])
-            cube([hanger_outer_diameter + 2, outer_border_width, bead_height], center = true);
+difference() {
+    union() {
+        border_half();
+        translate([0, 0, frame_height / 2])
+            connectors();
     }
+
+    translate([frame_width / 2, -hanger_connector_inset, (frame_height - hanger_height)/2])
+        scale([hanger_tolerance, hanger_tolerance, hanger_tolerance])
+            hanger();
 }
 
 // upper border half
@@ -62,9 +63,20 @@ translate([frame_width + 10, 0, 0]) {
 
         translate([0, 0, frame_height / 2 - connector_height - connector_tolerance])
             connectors(connector_tolerance * 2, connector_tolerance + 1);
+
+        translate([frame_width / 2, -hanger_connector_inset, frame_height - (frame_height - hanger_height)/2])
+            mirror([0, 0, 1])
+                scale([hanger_tolerance, hanger_tolerance, hanger_tolerance])
+                    hanger();        
     }
 }
 
+// hanger
+translate([frame_width / 2, frame_length/2, 0]) {
+    hanger();
+}
+
+/*
 // deko
 translate([40, 40, 0]) {
     for (x = [0:1:3]) {
@@ -74,7 +86,25 @@ translate([40, 40, 0]) {
         }
     }
 }
+*/
 
+module hanger() {
+    difference() {
+        union() {
+            // outer
+            cylinder(d = hanger_outer_diameter, h = hanger_height);
+            // frame connector
+            translate([0, hanger_connector_inset + hanger_connector_length/2, hanger_height/2]) {
+                cube([hanger_connector_width, hanger_connector_length, hanger_height], center = true);
+                translate([0, 0, hanger_height/2])
+                    cylinder(d=connector_diameter, h=hanger_connector_height - connector_tolerance);
+            }
+        }
+        // inner hole
+        translate([0,0,-1])
+            cylinder(d = hanger_inner_diameter, h = hanger_height + 2);
+    }
+}
 
 module border_half() {
     difference() {
@@ -139,7 +169,7 @@ module connectors(tolerance_offset = 0, height_offset = 0) {
             connector(tolerance_offset, height_offset, x, y);
         }
     }
-    connector(tolerance_offset, height_offset, 0.5, 0);
+
     connector(tolerance_offset, height_offset, 0.5, 1);
 }
 
