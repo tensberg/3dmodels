@@ -1,3 +1,5 @@
+use <multicolor.scad>
+
 $fn = 50;
 
 tolerance = 1;
@@ -43,50 +45,49 @@ textframe_inset = 2;
 textframe_x = (frame_width-textframe_width) / 2;
 textframe_y = frame_length - textframe_length + outer_border_width/2 - 2.5;
 
-// lower border half
-difference() {
-    union() {
-        border_half();
-        translate([0, 0, frame_height / 2])
-            connectors();
-    }
-
-    translate([frame_width / 2, -hanger_connector_inset, (frame_height - hanger_height)/2])
-        scale([hanger_tolerance, hanger_tolerance, hanger_tolerance])
-            hanger();
-}
-
-// upper border half
-translate([frame_width + 10, 0, 0]) {
+transparent_aquamarine() {
+    // lower border half
     difference() {
-        border_half();
+        union() {
+            border_half();
+            translate([0, 0, frame_height / 2])
+                connectors();
+        }
 
-        translate([0, 0, frame_height / 2 - connector_height - connector_tolerance])
-            connectors(connector_tolerance * 2, connector_tolerance + 1);
-
-        translate([frame_width / 2, -hanger_connector_inset, frame_height - (frame_height - hanger_height)/2])
-            mirror([0, 0, 1])
-                scale([hanger_tolerance, hanger_tolerance, hanger_tolerance])
-                    hanger();        
+        translate([frame_width / 2, -hanger_connector_inset, (frame_height - hanger_height)/2])
+            scale([hanger_tolerance, hanger_tolerance, hanger_tolerance])
+                hanger();
     }
-}
 
-// hanger
-translate([frame_width / 2, frame_length/2, 0]) {
-    hanger();
-}
+    // upper border half
+    translate([frame_width + 10, 0, 0]) {
+        difference() {
+            border_half();
 
-/*
-// deko
-translate([40, 40, 0]) {
-    for (x = [0:1:3]) {
-        for (y = [0:1:1]) {
-            translate([(bead_width + 2)*3*x, (bead_width + 2)*3*y, 0])
-                bead_deko();
+            translate([0, 0, frame_height / 2 - connector_height - connector_tolerance])
+                connectors(connector_tolerance * 2, connector_tolerance + 1);
+
+            translate([frame_width / 2, -hanger_connector_inset, frame_height - (frame_height - hanger_height)/2])
+                mirror([0, 0, 1])
+                    scale([hanger_tolerance, hanger_tolerance, hanger_tolerance])
+                        hanger();        
         }
     }
+
+    // hanger
+    translate([frame_width / 2, frame_length/2, 0]) {
+        hanger();
+    }
 }
-*/
+
+orange() {
+    // lower border half
+    border_half_text();
+
+    // upper border half
+    translate([frame_width + 10, 0, 0])
+        border_half_text();
+}
 
 module hanger() {
     difference() {
@@ -141,19 +142,27 @@ module border_half() {
             textbox();
         }
         
-        // textbox inset
-        translate([textframe_x + textframe_border, textframe_y + textframe_border, - textframe_inset])
-            linear_extrude(textframe_inset + 1)
-                offset(frame_offset-1) offset(-frame_offset+1)
-                    square([textframe_width - textframe_border * 2, textframe_length - textframe_border * 2]);
+        // hole for text
+        border_half_text(1);
     }
-    
-    // text
-    translate([frame_width / 2, textframe_y + textframe_length/2, 0])
-        linear_extrude(textframe_inset)
+}
+
+module border_half_text(additional_inset = 0) {
+    translate([frame_width / 2, textframe_y + textframe_length/2, -additional_inset]) {
+        linear_extrude(textframe_inset + additional_inset) {
+            // text
             mirror([0,1])
                 text("Nikolas 2012", halign="center", valign="center", size = 10, font="Comic Neue:style=Bold");
 
+            // border
+            difference() {
+                offset(frame_offset) offset(-frame_offset)
+                    square([textframe_width, textframe_length], center=true);
+                offset(frame_offset) offset(-frame_offset)
+                    square([textframe_width - 4, textframe_length - 4], center=true);
+            }
+        }
+    }
 }
 
 module textbox() {
