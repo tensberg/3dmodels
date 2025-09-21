@@ -1,4 +1,4 @@
-use <multicolor.scad>
+use <../module/multicolor.scad>
 
 module body_color() {
     multicolor("DarkOrange") children();
@@ -10,9 +10,9 @@ module highlight_color() {
 
 $fn = 60;
 
-//current_side = "ALL";
+current_side = "ALL";
 //current_side = "lower";
-current_side = "upper";
+//current_side = "upper";
 
 module side(side) {
     if (current_side != "ALL" && current_side != side) {
