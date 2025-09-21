@@ -1,8 +1,11 @@
 // source: https://erik.nygren.org/2018-3dprint-multicolor-openscad.html
 
 /* Pick a color below for STL export, or "ALL" to show all colors. */
-current_color = "ALL";
-//current_color = "Aquamarine";
+//current_color = "ALL";
+current_color = "White";
+//current_color = "Cyan";
+//current_color = "DarkOrange";
+//current_color = "Black";
 
 transparent_aquamarine()
     cube([1, 1, 1]);

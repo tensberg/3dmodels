@@ -1,18 +1,18 @@
 use <multicolor.scad>
 
 module body_color() {
-    multicolor("Cyan") children();
-}
-
-module highlight_color() {
     multicolor("DarkOrange") children();
 }
 
-$fn = 50;
+module highlight_color() {
+    multicolor("Cyan") children();
+}
+
+$fn = 60;
 
 //current_side = "ALL";
-current_side = "lower";
-//current_side = "upper";
+//current_side = "lower";
+current_side = "upper";
 
 module side(side) {
     if (current_side != "ALL" && current_side != side) {
@@ -28,8 +28,8 @@ bead_width = 5;
 bead_inner_diameter = 2;
 bead_height = 4;
 
-image_width = 141;
-image_length = 141;
+image_diameter = 140;
+image_radius = image_diameter/2;
 
 outer_border_width = 8;
 outer_border_thickness = 2;
@@ -37,8 +37,8 @@ inner_border_width = bead_width * 0.5;
 
 outer_margin_width = (tolerance + outer_border_width) * 2;
 margin_height = (tolerance + outer_border_thickness) * 2;
-frame_width = image_width + outer_margin_width;
-frame_length = image_length + outer_margin_width;
+frame_diameter = image_diameter + outer_margin_width;
+frame_radius = frame_diameter/2;
 frame_height = bead_height + margin_height;
 frame_offset = 4;
 
@@ -57,13 +57,13 @@ hanger_connector_height = (frame_height - hanger_height)/2 - 1;
 hanger_connector_inset = sqrt(hanger_radius^2 - (hanger_connector_width/2)^2);
 hanger_tolerance = 1.01;
 
-textframe_width = frame_width / 2;
+textframe_width = frame_diameter / 2;
 textframe_length = 20;
 textframe_border = 2;
 textframe_inset = 2;
 
-textframe_x = (frame_width-textframe_width) / 2;
-textframe_y = frame_length - textframe_length + outer_border_width/2 - 1.2;
+textframe_x = (frame_diameter-textframe_width) / 2;
+textframe_y = frame_diameter - textframe_length + outer_border_width/2 - 2;
 
 body_color() {
     // lower border half
@@ -75,7 +75,7 @@ body_color() {
                     connectors();
             }
 
-            translate([frame_width / 2, -hanger_connector_inset, (frame_height - hanger_height)/2])
+            translate([frame_diameter / 2, -hanger_connector_inset, (frame_height - hanger_height)/2])
                 scale([hanger_tolerance, hanger_tolerance, hanger_tolerance])
                     hanger();
         }
@@ -83,14 +83,14 @@ body_color() {
 
     // upper border half
     side("upper") {
-        translate([frame_width + 10, 0, 0]) {
+        translate([frame_diameter + 10, 0, 0]) {
             difference() {
                 border_half(false);
 
-                translate([0, 0, frame_height / 2 - connector_height - connector_tolerance])
-                    connectors(connector_tolerance * 2, connector_tolerance + 1);
+                translate([0, 0, frame_height / 2 - connector_height - connector_tolerance / 2])
+                    connectors(connector_tolerance * 2, connector_tolerance);
 
-                translate([frame_width / 2, -hanger_connector_inset, frame_height - (frame_height - hanger_height)/2])
+                translate([frame_diameter / 2, -hanger_connector_inset, frame_height - (frame_height - hanger_height)/2])
                     mirror([0, 0, 1])
                         scale([hanger_tolerance, hanger_tolerance, hanger_tolerance])
                             hanger();        
@@ -103,7 +103,7 @@ body_color() {
 highlight_color() {
     side("lower") {
         // hanger
-        translate([frame_width / 2, frame_length/2, 0]) {
+        translate([frame_diameter / 2, frame_diameter/2, 0]) {
             hanger();
         }
 
@@ -112,7 +112,7 @@ highlight_color() {
     }
 
     // upper border half
-    //translate([frame_width + 10, 0, 0])
+    //translate([frame_diameter + 10, 0, 0])
     //    border_half_text();
 }
 
@@ -138,9 +138,8 @@ module border_half(with_textbox) {
     difference() {
         // outer border of frame
         union() {
-            linear_extrude(frame_height/2)
-                offset(frame_offset) offset(-frame_offset)
-                    square([frame_width, frame_length]);
+            translate([frame_radius, frame_radius, 0])
+                cylinder(d=frame_diameter, h=frame_height/2);
         
             if (with_textbox) {
                 textbox();
@@ -150,18 +149,16 @@ module border_half(with_textbox) {
         // inner border of frame
         difference() {
             inner_margin_width = (tolerance + inner_border_width) * 2;
-            translate([outer_border_width + inner_border_width + tolerance, outer_border_width + inner_border_width + tolerance, -1])
-                linear_extrude(frame_height + 2)
-                    offset(frame_offset/2) offset(-frame_offset/2)
-                        square([image_width - inner_margin_width, image_length - inner_margin_width]);
+            translate([frame_radius, frame_radius, -1])
+                cylinder(d=image_diameter - inner_margin_width, h=frame_height + 2);
             if (with_textbox) {
                 textbox();
             }
         }
 
         // image opening
-        translate([outer_border_width, outer_border_width, outer_border_thickness + tolerance])
-            cube([image_width + tolerance*2, image_length + tolerance*2, bead_height + tolerance*2]);
+        translate([frame_radius, frame_radius, outer_border_thickness + tolerance])
+            cylinder(d=image_diameter + tolerance*2, h = bead_height + tolerance*2);
         
         // hole for text
         if (with_textbox) {
@@ -171,11 +168,11 @@ module border_half(with_textbox) {
 }
 
 module border_half_text(additional_inset = 0) {
-    translate([frame_width / 2, textframe_y + textframe_length/2, -additional_inset]) {
+    translate([frame_diameter / 2, textframe_y + textframe_length/2, -additional_inset]) {
         linear_extrude(textframe_inset + additional_inset) {
             // text
             mirror([0,1])
-                text("Nikolas 2012", halign="center", valign="center", size = 10, font="Comic Neue:style=Bold");
+                text("Tobias 2012", halign="center", valign="center", size = 10, font="Comic Neue:style=Bold");
 
             // border
             difference() {
@@ -196,16 +193,14 @@ module textbox() {
 }
 
 module connectors(tolerance_offset = 0, height_offset = 0) {
-    for (x = [0:1:1]) {
-        for (y = [0:0.5:1]) {
-            connector(tolerance_offset, height_offset, x, y);
-        }
+    for (i = [0:1:3]) {
+        a = i * 90 + 45;
+        connector(tolerance_offset, height_offset, frame_radius + (frame_radius-outer_border_width/2) * sin(a), frame_radius + (frame_radius-outer_border_width/2) * cos(a));
     }
-
-    connector(tolerance_offset, height_offset, 0.5, 1);
 }
 
 module connector(tolerance_offset, height_offset, x, y) {
-    translate([outer_border_width / 2 + x*(frame_width - outer_border_width), outer_border_width / 2 + y*(frame_length - outer_border_width), 0])
+    echo(x, y);
+    translate([x, y, 0])
         cylinder(d=connector_diameter + tolerance_offset, h=connector_height + tolerance_offset + height_offset);
 }
