@@ -99,3 +99,16 @@ module border_half(with_textbox) {
         }
     }
 }
+
+module connectors_round(frame_radius, outer_border_width, tolerance_offset = 0, height_offset = 0) {
+    for (i = [0:1:3]) {
+        a = i * 90 + 45;
+        connector_round(frame_radius, outer_border_width, tolerance_offset, height_offset, a);
+    }
+}
+
+module connector_round(frame_radius, outer_border_width, tolerance_offset, height_offset, angle) {
+    x = frame_radius + (frame_radius-outer_border_width/2) * sin(angle);
+    y = frame_radius + (frame_radius-outer_border_width/2) * cos(angle);
+    connector(x, y, tolerance_offset, height_offset);
+}

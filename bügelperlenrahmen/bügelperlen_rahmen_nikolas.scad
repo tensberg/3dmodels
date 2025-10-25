@@ -99,3 +99,18 @@ module border_half(with_textbox) {
         }
     }
 }
+
+module connectors_rect(frame_width, frame_length, outer_border_width, tolerance_offset = 0, height_offset = 0) {
+    for (x = [0:1:1]) {
+        for (y = [0:0.5:1]) {
+            connector_rect(frame_width, frame_length, outer_border_width, tolerance_offset, height_offset, x, y);
+        }
+    }
+    connector_rect(frame_width, frame_length, outer_border_width, tolerance_offset, height_offset, 0.5, 1);
+}
+
+module connector_rect(frame_width, frame_length, outer_border_width, tolerance_offset, height_offset, x_index, y_index) {
+    x = outer_border_width / 2 + x_index*(frame_width - outer_border_width);
+    y = outer_border_width / 2 + y_index*(frame_length - outer_border_width);
+    connector(x, y, tolerance_offset, height_offset);
+}
