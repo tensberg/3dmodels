@@ -76,9 +76,9 @@ module hanger() {
     }
 }
 
-module connector(x, y, tolerance_offset, height_offset) {
+module connector(x, y, female) {
     translate([x, y, 0])
-        cylinder(d=connector_diameter + tolerance_offset, h=connector_height + tolerance_offset + height_offset);
+        #cylinder(d=connector_diameter + (female ? connector_tolerance : 0), h=connector_height + (female ? 1 : 0));
 }
 
 module textbox() {

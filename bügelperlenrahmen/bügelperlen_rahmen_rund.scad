@@ -27,7 +27,7 @@ body_color() {
             union() {
                 border_half(has_inscription);
                 translate([0, 0, frame_height / 2])
-                    connectors_round(frame_radius, outer_border_width);
+                    connectors_round(frame_radius, outer_border_width, false);
             }
             translate([frame_diameter / 2, -hanger_connector_inset, (frame_height - hanger_height)/2])
                 scale([hanger_tolerance, hanger_tolerance, hanger_tolerance])
@@ -39,8 +39,8 @@ body_color() {
         translate([frame_diameter + 10, 0, 0]) {
             difference() {
                 border_half(false);
-                translate([0, 0, frame_height / 2 - connector_height - connector_tolerance / 2])
-                    connectors_round(frame_radius, outer_border_width, connector_tolerance * 2, connector_tolerance);
+                translate([0, 0, frame_height / 2 - connector_height])
+                    connectors_round(frame_radius, outer_border_width, true);
                 translate([frame_diameter / 2, -hanger_connector_inset, frame_height - (frame_height - hanger_height)/2])
                     mirror([0, 0, 1])
                         scale([hanger_tolerance, hanger_tolerance, hanger_tolerance])
@@ -100,15 +100,15 @@ module border_half(with_textbox) {
     }
 }
 
-module connectors_round(frame_radius, outer_border_width, tolerance_offset = 0, height_offset = 0) {
+module connectors_round(frame_radius, outer_border_width, female) {
     for (i = [0:1:3]) {
         a = i * 90 + 45;
-        connector_round(frame_radius, outer_border_width, tolerance_offset, height_offset, a);
+        connector_round(frame_radius, outer_border_width, a, female);
     }
 }
 
-module connector_round(frame_radius, outer_border_width, tolerance_offset, height_offset, angle) {
+module connector_round(frame_radius, outer_border_width, angle, female) {
     x = frame_radius + (frame_radius-outer_border_width/2) * sin(angle);
     y = frame_radius + (frame_radius-outer_border_width/2) * cos(angle);
-    connector(x, y, tolerance_offset, height_offset);
+    connector(x, y, female);
 }

@@ -26,7 +26,7 @@ body_color() {
             union() {
                 border_half(true);
                 translate([0, 0, frame_height / 2])
-                    connectors_rect(frame_width, frame_length, outer_border_width);
+                    connectors_rect(frame_width, frame_length, outer_border_width, false);
             }
             translate([frame_width / 2, -hanger_connector_inset, (frame_height - hanger_height)/2])
                 scale([hanger_tolerance, hanger_tolerance, hanger_tolerance])
@@ -38,8 +38,8 @@ body_color() {
         translate([frame_width + 10, 0, 0]) {
             difference() {
                 border_half(false);
-                translate([0, 0, frame_height / 2 - connector_height - connector_tolerance])
-                    connectors_rect(frame_width, frame_length, outer_border_width, connector_tolerance * 2, connector_tolerance + 1);
+                translate([0, 0, frame_height / 2 - connector_height])
+                    connectors_rect(frame_width, frame_length, outer_border_width, true);
                 translate([frame_width / 2, -hanger_connector_inset, frame_height - (frame_height - hanger_height)/2])
                     mirror([0, 0, 1])
                         scale([hanger_tolerance, hanger_tolerance, hanger_tolerance])
@@ -100,17 +100,17 @@ module border_half(with_textbox) {
     }
 }
 
-module connectors_rect(frame_width, frame_length, outer_border_width, tolerance_offset = 0, height_offset = 0) {
+module connectors_rect(frame_width, frame_length, outer_border_width, female) {
     for (x = [0:1:1]) {
         for (y = [0:0.5:1]) {
-            connector_rect(frame_width, frame_length, outer_border_width, tolerance_offset, height_offset, x, y);
+            connector_rect(frame_width, frame_length, outer_border_width, x, y, female);
         }
     }
-    connector_rect(frame_width, frame_length, outer_border_width, tolerance_offset, height_offset, 0.5, 1);
+    connector_rect(frame_width, frame_length, outer_border_width, 0.5, 1, female);
 }
 
-module connector_rect(frame_width, frame_length, outer_border_width, tolerance_offset, height_offset, x_index, y_index) {
+module connector_rect(frame_width, frame_length, outer_border_width, x_index, y_index, female) {
     x = outer_border_width / 2 + x_index*(frame_width - outer_border_width);
     y = outer_border_width / 2 + y_index*(frame_length - outer_border_width);
-    connector(x, y, tolerance_offset, height_offset);
+    connector(x, y, female);
 }
