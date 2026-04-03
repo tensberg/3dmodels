@@ -28,10 +28,17 @@ body_color() {
                 border_half(has_inscription);
                 translate([0, 0, frame_height / 2])
                     connectors_round(frame_radius, outer_border_width, false);
+                if (connected_hanger) {
+                    translate([frame_diameter / 2, -hanger_connector_inset, 0])
+                        scale([hanger_tolerance, hanger_tolerance, hanger_tolerance])
+                            hanger();
+                }
             }
-            translate([frame_diameter / 2, -hanger_connector_inset, (frame_height - hanger_height)/2])
-                scale([hanger_tolerance, hanger_tolerance, hanger_tolerance])
-                    hanger();
+            if (!connected_hanger) {
+                translate([frame_diameter / 2, -hanger_connector_inset, (frame_height - hanger_height)/2])
+                    scale([hanger_tolerance, hanger_tolerance, hanger_tolerance])
+                        hanger();
+            }
         }
     }
     // upper border half
@@ -54,8 +61,10 @@ body_color() {
 highlight_color() {
     side("lower") {
         // hanger
-        translate([frame_diameter / 2, frame_diameter/2, 0]) {
-            hanger();
+        if (!connected_hanger) {
+            translate([frame_diameter / 2, frame_diameter/2, 0]) {
+                hanger();
+            }
         }
         // lower border half
         if (has_inscription) {

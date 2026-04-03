@@ -23,7 +23,10 @@ connector_diameter = 5;
 connector_height_factor = 0.25; // Used to calculate connector height
 
 connector_height = frame_height * connector_height_factor;
-hanger_height = frame_height / 2;
+
+connected_hanger = false;
+
+hanger_height = connected_hanger ? frame_height : frame_height / 2;
 
 hanger_length_offset = 5;
 hanger_connector_length = outer_border_width*2/3;
@@ -78,7 +81,7 @@ module hanger() {
 
 module connector(x, y, female) {
     translate([x, y, 0])
-        #cylinder(d=connector_diameter + (female ? connector_tolerance : 0), h=connector_height + (female ? 1 : 0));
+        cylinder(d=connector_diameter + (female ? connector_tolerance : 0), h=connector_height + (female ? 1 : 0));
 }
 
 module textbox() {
